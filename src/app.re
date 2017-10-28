@@ -1,63 +1,71 @@
-external on : string => ('a => 'm => unit) => unit =
-  "" [@@bs.scope "ipcRenderer"] [@@bs.module "electron"];
-
-external send : string => 'm => unit = "" [@@bs.scope "ipcRenderer"] [@@bs.module "electron"];
-
-let getIndex handle => {
-  Event.getIndex send;
-  Event.handleGetIndexResponse on (fun _ index => handle index)
-};
-
-let savePost post => Event.setPost send post;
-
-/* open State; */
-/* type state = State.state; */
 type componentState = {
   post: State.post,
   index: State.index,
-  date: Date.t
+  date: Date.t,
+  fullscreen: bool,
+  diary: bool
 };
 
-/* let setDate _id {ReasonReact.state: state} => ReasonReact.Update {...state, date: Date.get ()}; */
 type action =
   | SetIndex State.index
-  | SetPost string;
+  | SetPost State.post
+  | ToggleDiary
+  | ToggleFullscreen;
 
 let component = ReasonReact.reducerComponent "JourApp";
 
-let emptyPost: State.post = {date: Date.today (), content: ""};
-
-let emptyIndex: State.index = [];
-
-let postIsOnDate date (post: State.post) => Date.equals date post.date;
-
 let make _children => {
-  ...component,
-  reducer: fun action state =>
-    switch action {
-    | SetIndex i => ReasonReact.Update {...state, index: i}
-    | SetPost content =>
-      let post = {...state.post, content};
-      savePost post;
-      ReasonReact.Update {...state, post}
+  let saveAndUpdatePost date content => {
+    let post: State.post = {date, content};
+    Actions.savePost post;
+    SetPost post
+  };
+  {
+    ...component,
+    reducer: fun action state =>
+      switch action {
+      | SetIndex i => ReasonReact.Update {...state, index: i}
+      | SetPost post => ReasonReact.Update {...state, post}
+      | ToggleDiary => ReasonReact.Update {...state, diary: not state.diary}
+      | ToggleFullscreen => ReasonReact.Update {...state, fullscreen: not state.fullscreen}
+      },
+    initialState: fun () => {
+      fullscreen: false,
+      diary: false,
+      index: State.emptyIndex,
+      date: Date.today (),
+      post: State.emptyPost
     },
-  initialState: fun () => (
-    {index: emptyIndex, date: Date.today (), post: emptyPost}: componentState
-  ),
-  didMount: fun {reduce} => {
-    getIndex (
-      fun ind => {
-        reduce (fun _ => SetIndex ind) ();
-        ()
-      }
-    );
-    ReasonReact.NoUpdate
-  },
-  render: fun {state, reduce} =>
-    <div>
-      <ComposePost onChange=(reduce (fun v => SetPost v)) post=state.post />
-      <SelectedPost index=state.index date=state.date />
-      <PostList index=state.index date=state.date />
-    </div>
-  /* let isToday = Date.equals (Date.today ()) state.date; */
+    didMount: fun {reduce, state} => {
+      Actions.on Event.toggleDiary (fun _val => reduce (fun _ => ToggleDiary) state);
+      if (state.index == State.emptyIndex) {
+        Actions.getIndex (fun ind => reduce (fun _ => SetIndex ind) state)
+      };
+      if (state.post == State.emptyPost) {
+        Actions.getPost (fun post => reduce (fun _ => SetPost post) state) state.date
+      };
+      ReasonReact.NoUpdate
+    },
+    render: fun {state, reduce} =>
+      <AppContainer>
+        (
+          state.diary ?
+            <PostList index=state.index /> :
+            <ComposePost
+              onChange=(reduce (saveAndUpdatePost state.post.date))
+              post=state.post
+              fullscreen=state.fullscreen
+            />
+        )
+      </AppContainer>
+  }
 };
+/* Actions.on
+     Event.enterFullScreen
+     (
+       fun () => {
+         Js.log "ENTER FULLSCreen";
+         reduce (fun _ => SetFullscreen true)
+       }
+     );
+   Actions.on Event.leaveFullScreen (fun () => reduce (fun _ => SetFullscreen false)); */

@@ -3,4 +3,8 @@ type post = {
   content: string
 };
 
-type index = list Date.t;
+type index = array Date.t;
+
+let emptyPost = {date: Date.today (), content: ""};
+
+let emptyIndex = [|Date.today ()|];

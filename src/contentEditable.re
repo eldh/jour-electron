@@ -27,7 +27,7 @@ let make ::styles=[] ::onChange ::html="" _children => {
       ReasonReact.Update state
     },
   initialState: fun () => {html, myRef: ref None},
-  willReceiveProps: fun self => {...self.state, html},
+  willReceiveProps: fun {state} => html == state.html ? {...state, html} : state,
   render: fun {state, reduce, handle} => {
     let className = css styles;
     <div

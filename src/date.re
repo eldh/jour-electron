@@ -12,7 +12,9 @@ type t = {
   year: int
 };
 
-let dateString d => H.i d.year ^ "-" ^ H.i d.month ^ "-" ^ H.i d.date;
+let add0 number => number > 9 ? H.i number : "0" ^ H.i number;
+
+let dateString d => H.i d.year ^ "-" ^ add0 d.month ^ "-" ^ add0 d.date;
 
 let getDay d => int_of_float (Js.Date.getDay (Js.Date.fromString (dateString d)));
 
@@ -26,24 +28,24 @@ let getDayString d =>
   | 3 => "Thursday"
   | 4 => "Friday"
   | 5 => "Saturday"
-  | 6 => "Sundat"
+  | 6 => "Sunday"
   | _ => "Funday"
   };
 
 let getMonthString d =>
   switch d.month {
-  | 0 => "January"
-  | 1 => "February"
-  | 2 => "March"
-  | 3 => "April"
-  | 4 => "May"
-  | 5 => "June"
-  | 6 => "July"
-  | 7 => "August"
-  | 8 => "September"
-  | 9 => "October"
-  | 10 => "November"
-  | 11 => "December"
+  | 1 => "January"
+  | 2 => "February"
+  | 3 => "March"
+  | 4 => "April"
+  | 5 => "May"
+  | 6 => "June"
+  | 7 => "July"
+  | 8 => "August"
+  | 9 => "September"
+  | 10 => "October"
+  | 11 => "November"
+  | 12 => "December"
   | _ => "Cooluary"
   };
 
@@ -79,7 +81,7 @@ let now () => {
   let minute: int = [%bs.raw {| new Date().getMinutes() |}];
   let hour: int = [%bs.raw {| new Date().getHours() |}];
   let date: int = [%bs.raw {| new Date().getDate() |}];
-  let month: int = [%bs.raw {| new Date().getMonth() |}];
+  let month: int = [%bs.raw {| new Date().getMonth() + 1 |}];
   let year: int = [%bs.raw {| new Date().getFullYear() |}];
   let retDate = {second, minute, hour, date, month, year};
   retDate
@@ -90,7 +92,7 @@ let today () => {
   let minute = 0;
   let hour = 0;
   let date: int = [%bs.raw {| new Date().getDate() |}];
-  let month: int = [%bs.raw {| new Date().getMonth() |}];
+  let month: int = [%bs.raw {| new Date().getMonth() + 1 |}];
   let year: int = [%bs.raw {| new Date().getFullYear() |}];
   let retDate = {second, minute, hour, date, month, year};
   retDate

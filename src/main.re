@@ -1,7 +1,10 @@
 external on : string => ('a => 'm => unit) => unit =
   "" [@@bs.scope "ipcMain"] [@@bs.module "electron"];
 
-let mockIndex: list Date.t = [];
+external register : string => (unit => unit) => unit =
+  "" [@@bs.scope "globalShortcut"] [@@bs.module "electron"];
+
+let mockIndex: list State.index = [];
 
 let getDiaryDir () => {
   let basePath = "/Users/eldh/Documents";
@@ -14,31 +17,68 @@ let getFilePathForDate d => {
   NodePath.join [|getDiaryDir (), filename|]
 };
 
+let filenameToDate (str: string) => {
+  let subStr = String.sub str;
+  let year = int_of_string (subStr 0 4);
+  let month = int_of_string (subStr 5 2);
+  let day = int_of_string (subStr 8 2);
+  let res = Date.get year month day;
+  res
+};
+
+let cleanFileList (files: array string) => Js_array.filter (fun f => f != ".DS_Store") files;
+
 let getIndex () => {
-  let files = NodeFs.readdirSync (getDiaryDir ());
-  Js.log files;
-  mockIndex
+  let files = cleanFileList (NodeFs.readdirSync (getDiaryDir ()));
+  let res = Array.map filenameToDate files;
+  res
 };
 
 let savePost (post: State.post) => {
-  Js.log post;
   let filename = getFilePathForDate post.date;
   NodeFs.writeFileSync ::filename text::post.content
 };
 
-let getPost date => {
+let getPostContent date => {
   let path = getFilePathForDate date;
-  Node_fs.readFileAsUtf8Sync path
+  let res = Node_fs.existsSync path ? Node_fs.readFileAsUtf8Sync path : "";
+  res
 };
 
-Event.handleSetPost on (fun _ (res: State.post) => savePost res);
-
-Event.handleGetPost
-  on
+on
+  Event.setPost
   (
-    fun (e: Js.t 'a) (date: Date.t) =>
-      Event.getPostResponse e##sender##send {date, content: getPost date}
+    fun _ (res: State.post) =>
+      try (savePost res) {
+      | _ => Js.log "Error saving post"
+      }
   );
 
-Event.handleGetIndex
-  on (fun (e: Js.t 'a) _ => Event.getIndexResponse e##sender##send (getIndex ()));
+on
+  Event.getPost
+  (
+    fun (e: Js.t 'a) (date: Date.t) => {
+      let content =
+        try (getPostContent date) {
+        | _ =>
+          Js.log "Error fetching post content";
+          ""
+        };
+      let post: State.post = {date, content};
+      e##returnValue#=post
+    }
+  );
+
+on
+  Event.getIndex
+  (
+    fun (e: Js.t 'a) _ => {
+      let i =
+        try (getIndex ()) {
+        | _ =>
+          Js.log "Error fetching index";
+          [||]
+        };
+      e##returnValue#=i
+    }
+  );

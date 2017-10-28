@@ -20,7 +20,11 @@ let component = ReasonReact.statelessComponent "SelectedPost";
 let make date::(date: Date.t) index::(index: State.index) _children => {
   ...component,
   render: fun _self => {
-    let date = List.find (Date.equals date) index;
+    let date =
+      switch (Js_array.find (Date.equals date) index) {
+      | None => raise Not_found
+      | Some res => res
+      };
     <div className> <div> (H.se ("Post date is " ^ Date.format DMY date)) </div> </div>
     /* <div> (H.se post.content) </div> */
   }
