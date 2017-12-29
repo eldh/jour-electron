@@ -1,21 +1,24 @@
 open Glamor;
 
 let className =
-  S.css [
+  S.css([
     S.flex,
     S.center,
-    [background "#0a0a0a", color "white", flexGrow "1", width "100vw", height "100vh"]
-  ];
+    [background("#oa0a0a"), color("white"), flexGrow("1"), width("100vw"), height("100vh")]
+  ]);
 
-let postIsOnDate date (post: State.post) => Date.equals date post.date;
+let postIsOnDate = (date, post: State.post) => Date.equals(date, post.date);
 
-let component = ReasonReact.statelessComponent "ComposePost";
+let component = ReasonReact.statelessComponent("ComposePost");
 
-let make ::fullscreen ::onChange post::(post: State.post) _children => {
+let make = (~fullscreen, ~updateDate, ~dateWarning, ~onChange, ~post: State.post, _children) => {
   ...component,
-  render: fun _self =>
+  render: (_self) =>
     <div className>
-      <PostHeader post fullscreen />
+      (
+        dateWarning ?
+          <DateSwitcher onClick=((_) => updateDate()) /> : <PostHeader post fullscreen />
+      )
       <StoryInput value=post.content onChange />
     </div>
 };

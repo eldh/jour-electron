@@ -1,71 +1,66 @@
 open Glamor;
 
 type state = {
-  date: option Date.t,
+  date: option(Date.t),
   post: State.post
 };
 
 type action =
-  | SetBoth State.post (option Date.t);
+  | SetState(State.post, option(Date.t));
 
 let className =
-  css [
-    background "rgba(0, 0, 0, 0.2)",
-    color "white",
-    listStyleType "none",
-    fontFamily "Menlo",
-    color "#6f6f6f",
-    paddingLeft "0",
-    marginLeft "0",
-    minHeight "100vh"
-  ];
+  css([
+    background("rgba(0, 0, 0, 0.2)"),
+    color("white"),
+    listStyleType("none"),
+    fontFamily("Menlo"),
+    color("#6f6f6f"),
+    width("calc(100% - 26px)"),
+    maxWidth("600px"),
+    paddingLeft("0"),
+    margin("auto"),
+    minHeight("100vh")
+  ]);
 
-let component = ReasonReact.reducerComponent "PostList";
+let component = ReasonReact.reducerComponent("PostList");
 
-let make index::(index: State.index) _children => {
-  let getPostForDate self (date: Date.t) => {
-    let getIt () => {
-      Js.log "getIt;";
-      Actions.getPost
-        (
-          fun post => {
-            Js.log2 "getPost" post;
-            self.ReasonReact.reduce (fun _ => SetBoth post (Some date)) ()
-          }
-        )
+let make = (~posts: State.posts, _children) => {
+  let getPostForDate = (self, date: Date.t) => {
+    let getIt = () => {
+      Actions.getPost(
+        (post) => {
+          self.ReasonReact.reduce((_) => SetState(post, Some(date)), ())
+        },
         date
+      )
     };
-    Js.log2 "switch" self.state.date;
     switch self.state.date {
-    | None => getIt ()
-    | Some d =>
-      Js.log3 date d "dates";
-      if (Date.equals date d) {
-        Js.log "equals";
-        self.ReasonReact.reduce (fun _ => SetBoth State.emptyPost None) ()
+    | None => getIt()
+    | Some(d) =>
+      if (Date.equals(date, d)) {
+        self.ReasonReact.reduce((_) => SetState(State.emptyPost, None), ())
       } else {
-        getIt ()
+        getIt()
       }
     }
   };
   {
     ...component,
-    initialState: fun () => {date: None, post: State.emptyPost},
-    reducer: fun action state =>
+    initialState: () => {date: None, post: State.emptyPost},
+    reducer: (action, _state) =>
       switch action {
-      | SetBoth post date => ReasonReact.Update {post, date}
+      | SetState(post, date) => ReasonReact.Update({post, date})
       },
-    render: fun self => {
-      let getDiaryRow date => {
-        Js.log2 "render" self.state.date;
+    render: (self) => {
+      let getDiaryRow = (date) => {
         <DiaryRow
-          key=(Date.format Date.YYYYMMDD date)
+          key=(Date.format(Date.YYYYMMDD, date))
           date
           post=self.state.post
-          onClick=(fun _ => getPostForDate self date)
+          onClick=((_) => getPostForDate(self, date))
         />
       };
-      <ul className> (H.ae (Array.map getDiaryRow index)) </ul>
+      <ul className> (H.ae(Array.map(getDiaryRow, posts))) </ul>
     }
   }
 };

@@ -2,32 +2,34 @@
   "name": "reason-react-example",
   "private": true,
   "version": "0.0.0",
-  "description": "",
+  "description": "A simple diary app.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "startWP": "concurrently --kill-others --names bs,wp -c blue,grey \"bsb -make-world -w\" \"webpack -w\"",
     "start": "bsb -make-world -w",
-    "build": "bsb -make-world && webpack",
+    "build": "bsb -make-world && electron-packager . Jour --platform=darwin --icon=assets/icon/mac/jour.icns",
     "clean": "bsb -clean-world",
-    "electron": "electron ."
+    "electron": "electron . --icon=assets/icon/mac/jour.icns"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bs-director": "^0.0.1",
+    "bs-platform": "^2.1.0",
     "bs-glamor": "^0.1.3",
     "bs-node": "github:buckletypes/bs-node",
     "electron-reload": "^1.2.1",
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2",
-    "reason-react": "^0.2.4"
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "reason-react": "^0.3.0"
   },
   "devDependencies": {
-    "bs-platform": "^1.9.1",
     "concurrently": "^3.5.0",
     "electron": "^1.6.11",
+    "electron-builder": "^19.49.2",
+    "electron-packager": "^10.1.0",
     "eslint": "^4.7.2",
     "eslint-config-prettier": "^2.6.0",
     "prettier": "^1.7.1",

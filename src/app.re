@@ -1,63 +1,92 @@
+type view =
+  | Compose
+  | Diary;
+
 type componentState = {
+  now: Date.t,
   post: State.post,
-  index: State.index,
-  date: Date.t,
+  posts: State.posts,
+  initialDate: Date.t,
   fullscreen: bool,
-  diary: bool
+  view
 };
 
 type action =
-  | SetIndex State.index
-  | SetPost State.post
+  | SetPosts(State.posts)
+  | SetPost(State.post)
+  | SetInitialDate(Date.t)
+  | SetNow(Date.t)
+  | SetView(view)
   | ToggleDiary
   | ToggleFullscreen;
 
-let component = ReasonReact.reducerComponent "JourApp";
+let component = ReasonReact.reducerComponent("JourApp");
 
-let make _children => {
-  let saveAndUpdatePost date content => {
+let make = (_children) => {
+  let intervalId: ref(option(Js_global.intervalId)) = ref(None);
+  let saveAndUpdatePost = (date, content) => {
     let post: State.post = {date, content};
-    Actions.savePost post;
-    SetPost post
+    Actions.savePost(post);
+    SetPost(post)
   };
   {
     ...component,
-    reducer: fun action state =>
+    reducer: (action, state) =>
       switch action {
-      | SetIndex i => ReasonReact.Update {...state, index: i}
-      | SetPost post => ReasonReact.Update {...state, post}
-      | ToggleDiary => ReasonReact.Update {...state, diary: not state.diary}
-      | ToggleFullscreen => ReasonReact.Update {...state, fullscreen: not state.fullscreen}
+      | SetPosts(i) => ReasonReact.Update({...state, posts: i})
+      | SetPost(post) => ReasonReact.Update({...state, post})
+      | SetInitialDate(date) => ReasonReact.Update({...state, initialDate: date})
+      | SetNow(now) => ReasonReact.Update({...state, now})
+      | SetView(view) => ReasonReact.Update({...state, view})
+      | ToggleDiary => ReasonReact.Update({...state, view: state.view === Diary ? Compose : Diary})
+      | ToggleFullscreen => ReasonReact.Update({...state, fullscreen: ! state.fullscreen})
       },
-    initialState: fun () => {
+    initialState: () => {
       fullscreen: false,
-      diary: false,
-      index: State.emptyIndex,
-      date: Date.today (),
+      view: Compose,
+      posts: State.emptyPosts,
+      initialDate: Date.today(),
+      now: Date.today(),
       post: State.emptyPost
     },
-    didMount: fun {reduce, state} => {
-      Actions.on Event.toggleDiary (fun _val => reduce (fun _ => ToggleDiary) state);
-      if (state.index == State.emptyIndex) {
-        Actions.getIndex (fun ind => reduce (fun _ => SetIndex ind) state)
+    didMount: (self) => {
+      let setNow = () => {
+        self.reduce((now) => SetNow(now), Date.today())
       };
-      if (state.post == State.emptyPost) {
-        Actions.getPost (fun post => reduce (fun _ => SetPost post) state) state.date
+      intervalId := Some(Js_global.setInterval(setNow, 1000 * 1));
+      Actions.on(Event.openDiary, self.reduce(() => ToggleDiary));
+      if (self.state.posts === State.emptyPosts) {
+        Actions.getPosts(self.reduce((posts) => SetPosts(posts)))
+      };
+      if (self.state.post === State.emptyPost) {
+        Actions.getPost(self.reduce((post) => SetPost(post)), self.state.initialDate)
       };
       ReasonReact.NoUpdate
     },
-    render: fun {state, reduce} =>
-      <AppContainer>
-        (
-          state.diary ?
-            <PostList index=state.index /> :
-            <ComposePost
-              onChange=(reduce (saveAndUpdatePost state.post.date))
-              post=state.post
-              fullscreen=state.fullscreen
-            />
-        )
-      </AppContainer>
+    willUnmount: (_) =>
+      switch intervalId^ {
+      | Some(t) => Js_global.clearInterval(t)
+      | None => ()
+      },
+    render: ({state, reduce}) => {
+      let content =
+        switch state.view {
+        | Diary => <PostList posts=state.posts />
+        | Compose =>
+          <ComposePost
+            onChange=(reduce(saveAndUpdatePost(state.post.date)))
+            updateDate=(
+              (e) => {
+                reduce((_) => SetInitialDate(Date.today()), e)
+              }
+            )
+            post=state.post
+            dateWarning=(!Date.equals(state.initialDate, state.now))
+            fullscreen=state.fullscreen
+          />
+        };
+      <AppContainer> content </AppContainer>
+    }
   }
 };
 /* Actions.on

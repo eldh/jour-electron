@@ -6,6 +6,6 @@ let ae = ReasonReact.arrayToElement;
 
 let null = ReasonReact.nullElement;
 
-let ie n => se (string_of_int n);
+let ie = (n) => se(string_of_int(n));
 
-external alert : string => unit = "alert" [@@bs.val];
+[@bs.val] external alert : string => unit = "alert";

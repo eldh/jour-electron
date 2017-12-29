@@ -17,6 +17,7 @@ function createWindow() {
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#0a0a0a',
     vibrancy: 'ultra-dark',
+    icon: path.join(__dirname, 'assets/icon/png/64x64.png'),
     webPreferences: {
       defaultFontSize: '14px',
       defaultFontFamily: 'Menlo',
@@ -39,8 +40,11 @@ function createWindow() {
 
   // Really dirty to keep this here but wtf.
   electron.globalShortcut.register('Shift+Command+D', () => {
-    mainWindow.webContents.send('toggleDiary')
+    mainWindow.webContents.send('openDiary')
   })
+  // electron.globalShortcut.register('Shift+,', () => {
+  //   mainWindow.webContents.send('openSettings')
+  // })
 
   require('./menu')
 }

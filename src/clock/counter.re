@@ -17,7 +17,6 @@ let make _children => {
   didMount: fun {state, update} =>
     ReasonReact.SilentUpdate {...state, timerId: Some (Js.Global.setInterval (update setDate) 500)},
   render: fun {state, update} => {
-    Js.log state.activeSecond;
     <div>
       <TimeInput
         date=state.date

@@ -13,16 +13,21 @@ let className = (fullscreen) =>
       fontFamily("Menlo"),
       color("#6f6f6f"),
       width("100vw"),
-      borderBottom("1px rgba(0, 0, 0, 0.2) solid")
+      borderBottom("1px rgba(0, 0, 0, 0.2) solid"),
+      backgroundColor("#444444"),
+      cursor("pointer"),
+      color("#ffffff"),
+      transition("background-color 0.2s ease"),
+      Selector(":hover", [backgroundColor("#449922")])
     ]
   ]);
 
 let component = ReasonReact.statelessComponent("PostHeader");
 
-let make = (~post: State.post, ~fullscreen, _children) => {
+let make = (~onClick, ~fullscreen=false, _children) => {
   ...component,
   render: (_self) =>
-    <div className=(className(fullscreen))>
-      (H.se(Date.format(DMY, post.date)))
+    <div className=(className(fullscreen)) onClick>
+      (H.se("It's a new day. Click to start your next story."))
     </div>
 };

@@ -1,21 +1,27 @@
 open Glamor;
 
-let className = css [flexGrow "1", padding "20px"];
+let base = [flexGrow("1"), padding("20px")];
 
-let component = ReasonReact.statelessComponent "DiaryRow";
+let component = ReasonReact.statelessComponent("DiaryRow");
 
-let make date::(date: Date.t) ::onClick post::(post: option State.post)=? _children => {
+let make = (~date: Date.t, ~onClick, ~post: option(State.post)=?, _children) => {
   ...component,
-  render: fun _self =>
-    <li onClick className>
-      <div> (H.se (Date.format Date.DMY date)) </div>
-      <PreText styles=[padding "20px 0"]>
+  render: (_self) => {
+    let textColor =
+      switch post {
+      | Some(p) => Date.equals(p.date, date) ? "white" : "#6f6f6f"
+      | None => "#6f6f6f"
+      };
+    <li onClick className=(css([color(textColor), ...base]))>
+      <div> (H.se(Date.format(Date.DMY, date))) </div>
+      <PreText styles=[padding("20px 0")]>
         (
           switch post {
-          | Some p => Date.equals p.date date ? H.se p.content : H.null
+          | Some(p) => Date.equals(p.date, date) ? H.se(p.content) : H.null
           | None => H.null
           }
         )
       </PreText>
     </li>
+  }
 };

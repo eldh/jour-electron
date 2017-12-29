@@ -39,7 +39,7 @@ const template = [
         label: 'View diary',
         accelerator: process.platform === 'darwin' ? 'Alt+Command+D' : 'Ctrl+Shift+D',
         click(item, focusedWindow) {
-          if (focusedWindow) focusedWindow.webContents.send('viewDiary')
+          if (focusedWindow) focusedWindow.webContents.send('openDiary')
         },
       },
       {
@@ -97,6 +97,13 @@ if (process.platform === 'darwin') {
       {
         type: 'separator',
       },
+      // {
+      //   label: 'Preferences…',
+      //   accelerator: process.platform === 'darwin' ? 'Command+,' : 'Ctrl+Shift+S',
+      //   click(item, focusedWindow) {
+      //     if (focusedWindow) focusedWindow.webContents.send('openSettings')
+      //   },
+      // },
       {
         role: 'hide',
       },
