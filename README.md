@@ -1,19 +1,7 @@
-This is a repo with examples usages of [ReasonReact](https://github.com/reasonml/reason-react), whose docs are [here](https://reasonml.github.io/reason-react/).
-Have something you don't understand? Join us on [Discord](https://discord.gg/reasonml)!
+# Jour
 
-```sh
-git clone https://github.com/chenglou/reason-react-example.git
-cd reason-react-example
-npm install
-npm run build
-```
+Jour is a simple diary app. It saves all data locally (to your documents folder).
 
-Then open `src/index.html` to see the links to the examples (**no server needed!**). 
+It's built with [Reason](https://reasonml.github.io), [ReasonReact](https://reasonml.github.io/reason-react/) and [Electron](http://electronjs.org/).
 
-To keep a watcher open, do:
-
-```sh
-npm start
-```
-
-This builds and watches the files. You can then modify whichever file in `src` and refresh the page to see the changes.
+[Download the app]()

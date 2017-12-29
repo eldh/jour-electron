@@ -1,20 +1,18 @@
 {
-  "name": "reason-react-example",
-  "private": true,
-  "version": "0.0.0",
+  "name": "jour-electron",
+  "version": "0.0.1",
   "description": "A simple diary app.",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "startWP": "concurrently --kill-others --names bs,wp -c blue,grey \"bsb -make-world -w\" \"webpack -w\"",
     "start": "bsb -make-world -w",
-    "build": "bsb -make-world && electron-packager . Jour --platform=darwin --icon=assets/icon/mac/jour.icns",
+    "build": "bsb -make-world && electron-packager . Jour --platform=darwin --icon=assets/icon/mac/jour.icns --overwrite=true",
     "clean": "bsb -clean-world",
     "electron": "electron . --icon=assets/icon/mac/jour.icns"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "eldh",
+  "license": "MIT",
   "dependencies": {
     "bs-director": "^0.0.1",
     "bs-platform": "^2.1.0",

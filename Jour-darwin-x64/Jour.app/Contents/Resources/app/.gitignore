@@ -1,0 +1,9 @@
+.merlin
+/node_modules/
+/Jour-darwin-x64/
+/lib/*
+!/lib/js/*
+/dist/*
+/bundledOutputs/
+npm-debug.log
+.DS_Store
