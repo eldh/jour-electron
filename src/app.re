@@ -24,10 +24,10 @@ let component = ReasonReact.reducerComponent("JourApp");
 
 let make = (_children) => {
   let intervalId: ref(option(Js_global.intervalId)) = ref(None);
-  let saveAndUpdatePost = (date, content) => {
+  let saveAndUpdatePost = (send, date, content) => {
     let post: State.post = {date, content};
     Actions.savePost(post);
-    SetPost(post)
+    send(SetPost(post))
   };
   {
     ...component,
@@ -50,16 +50,14 @@ let make = (_children) => {
       post: State.emptyPost
     },
     didMount: (self) => {
-      let setNow = () => {
-        self.reduce((now) => SetNow(now), Date.today())
-      };
+      let setNow = () => self.send(SetNow(Date.today()));
       intervalId := Some(Js_global.setInterval(setNow, 1000 * 1));
-      Actions.on(Event.openDiary, self.reduce(() => ToggleDiary));
+      Actions.on(Event.openDiary, () => self.send(ToggleDiary));
       if (self.state.posts === State.emptyPosts) {
-        Actions.getPosts(self.reduce((posts) => SetPosts(posts)))
+        Actions.getPosts((posts) => self.send(SetPosts(posts)))
       };
       if (self.state.post === State.emptyPost) {
-        Actions.getPost(self.reduce((post) => SetPost(post)), self.state.initialDate)
+        Actions.getPost((post) => self.send(SetPost(post)), self.state.initialDate)
       };
       ReasonReact.NoUpdate
     },
@@ -68,20 +66,16 @@ let make = (_children) => {
       | Some(t) => Js_global.clearInterval(t)
       | None => ()
       },
-    render: ({state, reduce}) => {
+    render: ({state, send}) => {
       let content =
         switch state.view {
         | Diary => <PostList posts=state.posts />
         | Compose =>
           <ComposePost
-            onChange=(reduce(saveAndUpdatePost(state.post.date)))
-            updateDate=(
-              (e) => {
-                reduce((_) => SetInitialDate(Date.today()), e)
-              }
-            )
+            onChange=(saveAndUpdatePost(send, state.post.date))
+            updateDate=(() => send(SetInitialDate(Date.today())))
             post=state.post
-            dateWarning=(!Date.equals(state.initialDate, state.now))
+            dateWarning=(! Date.equals(state.initialDate, state.now))
             fullscreen=state.fullscreen
           />
         };
@@ -89,12 +83,3 @@ let make = (_children) => {
     }
   }
 };
-/* Actions.on
-     Event.enterFullScreen
-     (
-       fun () => {
-         Js.log "ENTER FULLSCreen";
-         reduce (fun _ => SetFullscreen true)
-       }
-     );
-   Actions.on Event.leaveFullScreen (fun () => reduce (fun _ => SetFullscreen false)); */

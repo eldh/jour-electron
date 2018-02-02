@@ -10,32 +10,33 @@ type action =
 
 let component = ReasonReact.reducerComponent("ContentEditable");
 
-let setRef = (theRef, {ReasonReact.state}) => state.myRef := Js.Nullable.to_opt(theRef);
+let setRef = (theRef, {ReasonReact.state}) =>
+  state.myRef := Js.Nullable.to_opt(theRef);
 
 let make = (~styles=[], ~onChange, ~html="", _children) => {
   ...component,
   reducer: (action, state) =>
-    switch action {
+    switch (action) {
     | HandleChange =>
-      switch state.myRef^ {
+      switch (state.myRef^) {
       | None => ()
       | Some(theRef) =>
         let obj = ReactDOMRe.domElementToObj(theRef);
         let html = obj##innerHTML;
-        onChange(html)
+        onChange(html);
       };
-      ReasonReact.Update(state)
+      ReasonReact.Update(state);
     },
   initialState: () => {html, myRef: ref(None)},
   willReceiveProps: ({state}) => html == state.html ? {...state, html} : state,
-  render: ({state, reduce, handle}) => {
+  render: ({state, send, handle}) => {
     let className = css(styles);
     <div
       ref=(handle(setRef))
       contentEditable=Js.true_
       className
       dangerouslySetInnerHTML={"__html": state.html}
-      onInput=(reduce((_) => HandleChange))
-    />
+      onInput=((_) => send(HandleChange))
+    />;
   }
 };

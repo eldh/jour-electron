@@ -23,5 +23,5 @@ let className =
 
 let make = (~onChange, ~value, _children) => {
   ...component,
-  render: (_self) => <Textarea className value onChange />
+  render: _self => <Textarea className value onChange />
 };

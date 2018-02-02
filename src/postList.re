@@ -26,41 +26,37 @@ let component = ReasonReact.reducerComponent("PostList");
 
 let make = (~posts: State.posts, _children) => {
   let getPostForDate = (self, date: Date.t) => {
-    let getIt = () => {
+    let getIt = () =>
       Actions.getPost(
-        (post) => {
-          self.ReasonReact.reduce((_) => SetState(post, Some(date)), ())
-        },
+        post => self.ReasonReact.send(SetState(post, Some(date))),
         date
-      )
-    };
-    switch self.state.date {
+      );
+    switch (self.state.date) {
     | None => getIt()
     | Some(d) =>
       if (Date.equals(date, d)) {
-        self.ReasonReact.reduce((_) => SetState(State.emptyPost, None), ())
+        self.ReasonReact.send(SetState(State.emptyPost, None));
       } else {
-        getIt()
+        getIt();
       }
-    }
+    };
   };
   {
     ...component,
     initialState: () => {date: None, post: State.emptyPost},
     reducer: (action, _state) =>
-      switch action {
+      switch (action) {
       | SetState(post, date) => ReasonReact.Update({post, date})
       },
-    render: (self) => {
-      let getDiaryRow = (date) => {
+    render: self => {
+      let getDiaryRow = date =>
         <DiaryRow
           key=(Date.format(Date.YYYYMMDD, date))
           date
           post=self.state.post
           onClick=((_) => getPostForDate(self, date))
-        />
-      };
-      <ul className> (H.ae(Array.map(getDiaryRow, posts))) </ul>
+        />;
+      <ul className> (H.ae(Array.map(getDiaryRow, posts))) </ul>;
     }
-  }
+  };
 };

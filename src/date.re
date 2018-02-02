@@ -12,15 +12,18 @@ type t = {
   year: int
 };
 
-let add0 = (number) => number > 9 ? H.i(number) : "0" ++ H.i(number);
+let add0 = number => number > 9 ? H.i(number) : "0" ++ H.i(number);
 
-let dateString = (d) => H.i(d.year) ++ ("-" ++ (add0(d.month) ++ ("-" ++ add0(d.date))));
+let dateString = d =>
+  H.i(d.year) ++ "-" ++ add0(d.month) ++ "-" ++ add0(d.date);
 
-let getDay = (d) => int_of_float(Js.Date.getDay(Js.Date.fromString(dateString(d))));
+let getDay = d =>
+  int_of_float(Js.Date.getDay(Js.Date.fromString(dateString(d))));
 
-let equals = (d1, d2) => d1.year === d2.year && d1.month === d2.month && d1.date === d2.date;
+let equals = (d1, d2) =>
+  d1.year === d2.year && d1.month === d2.month && d1.date === d2.date;
 
-let getDayString = (d) =>
+let getDayString = d =>
   switch (getDay(d)) {
   | 0 => "Monday"
   | 1 => "Tuesday"
@@ -32,8 +35,8 @@ let getDayString = (d) =>
   | _ => "Funday"
   };
 
-let getMonthString = (d) =>
-  switch d.month {
+let getMonthString = d =>
+  switch (d.month) {
   | 1 => "January"
   | 2 => "February"
   | 3 => "March"
@@ -49,7 +52,7 @@ let getMonthString = (d) =>
   | _ => "Cooluary"
   };
 
-let getShortDayString = (d) =>
+let getShortDayString = d =>
   switch (getDay(d)) {
   | 0 => "Mon"
   | 1 => "Tue"
@@ -62,10 +65,10 @@ let getShortDayString = (d) =>
   };
 
 let format = (format: formatters, d) =>
-  switch format {
+  switch (format) {
   | YYYYMMDD => dateString(d)
-  | DMY => getDayString(d) ++ (", " ++ (H.i(d.date) ++ (" " ++ getMonthString(d))))
-  | HHmm => H.i(d.hour) ++ (":" ++ H.i(d.minute))
+  | DMY => getDayString(d) ++ ", " ++ H.i(d.date) ++ " " ++ getMonthString(d)
+  | HHmm => H.i(d.hour) ++ ":" ++ H.i(d.minute)
   };
 
 let get = (year, month, date) => {
@@ -73,7 +76,7 @@ let get = (year, month, date) => {
   let minute = 0;
   let hour = 0;
   let retDate = {second, minute, hour, date, month, year};
-  retDate
+  retDate;
 };
 
 let now = () => {
@@ -84,7 +87,7 @@ let now = () => {
   let month: int = [%bs.raw {| new Date().getMonth() + 1 |}];
   let year: int = [%bs.raw {| new Date().getFullYear() |}];
   let retDate = {second, minute, hour, date, month, year};
-  retDate
+  retDate;
 };
 
 let today = () => {
@@ -95,5 +98,5 @@ let today = () => {
   let month: int = [%bs.raw {| new Date().getMonth() + 1 |}];
   let year: int = [%bs.raw {| new Date().getFullYear() |}];
   let retDate = {second, minute, hour, date, month, year};
-  retDate
+  retDate;
 };

@@ -4,8 +4,8 @@ let component = ReasonReact.statelessComponent("Pre");
 
 let make = (~styles=[], children) => {
   ...component,
-  render: (_self) => {
+  render: _self => {
     let className = css([whiteSpace("pre-wrap"), ...styles]);
-    <div className> (ReasonReact.arrayToElement(children)) </div>
+    <div className> (ReasonReact.arrayToElement(children)) </div>;
   }
 };

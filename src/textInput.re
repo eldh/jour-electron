@@ -8,14 +8,14 @@ let component = ReasonReact.reducerComponent("Input");
 let make = (~styles=[], ~onChange, ~value, _children) => {
   ...component,
   reducer: (action, _state) =>
-    switch action {
+    switch (action) {
     | HandleChange(event) =>
       let value = ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value;
-      onChange(value)
+      onChange(value);
     },
   initialState: () => value,
-  willReceiveProps: (_self) => value,
-  render: ({state, reduce}) => {
+  willReceiveProps: _self => value,
+  render: ({state, send}) => {
     let className =
       css([
         background("rgb(37, 37, 37)"),
@@ -23,6 +23,11 @@ let make = (~styles=[], ~onChange, ~value, _children) => {
         border("1px rgb(75, 75, 75) solid"),
         ...styles
       ]);
-    <input className _type="text" value=state onChange=(reduce((e) => HandleChange(e))) />
+    <input
+      className
+      _type="text"
+      value=state
+      onChange=(e => send(HandleChange(e)))
+    />;
   }
 };

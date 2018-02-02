@@ -1,6 +1,6 @@
 open Glamor;
 
-let className = (fullscreen) =>
+let className = fullscreen =>
   S.css([
     fullscreen ? [height("60px")] : [height("40px")],
     S.flex,
@@ -21,7 +21,7 @@ let component = ReasonReact.statelessComponent("PostHeader");
 
 let make = (~post: State.post, ~fullscreen, _children) => {
   ...component,
-  render: (_self) =>
+  render: _self =>
     <div className=(className(fullscreen))>
       (H.se(Date.format(DMY, post.date)))
     </div>

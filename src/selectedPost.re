@@ -19,13 +19,15 @@ let component = ReasonReact.statelessComponent("SelectedPost");
 
 let make = (~date: Date.t, ~posts: State.posts, _children) => {
   ...component,
-  render: (_self) => {
+  render: _self => {
     let date =
       switch (Js_array.find(Date.equals(date), posts)) {
       | None => raise(Not_found)
       | Some(res) => res
       };
-    <div className> <div> (H.se("Post date is " ++ Date.format(DMY, date))) </div> </div>
-    /* <div> (H.se post.content) </div> */
+    <div className>
+      <div> (H.se("Post date is " ++ Date.format(DMY, date))) </div>
+    </div>;
   }
+  /* <div> (H.se post.content) </div> */
 };

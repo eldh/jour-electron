@@ -6,9 +6,9 @@ let component = ReasonReact.statelessComponent("DiaryRow");
 
 let make = (~date: Date.t, ~onClick, ~post: option(State.post)=?, _children) => {
   ...component,
-  render: (_self) => {
+  render: _self => {
     let textColor =
-      switch post {
+      switch (post) {
       | Some(p) => Date.equals(p.date, date) ? "white" : "#6f6f6f"
       | None => "#6f6f6f"
       };
@@ -16,12 +16,12 @@ let make = (~date: Date.t, ~onClick, ~post: option(State.post)=?, _children) => 
       <div> (H.se(Date.format(Date.DMY, date))) </div>
       <PreText styles=[padding("20px 0")]>
         (
-          switch post {
+          switch (post) {
           | Some(p) => Date.equals(p.date, date) ? H.se(p.content) : H.null
           | None => H.null
           }
         )
       </PreText>
-    </li>
+    </li>;
   }
 };

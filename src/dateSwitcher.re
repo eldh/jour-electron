@@ -1,6 +1,6 @@
 open Glamor;
 
-let className = (fullscreen) =>
+let className = fullscreen =>
   S.css([
     fullscreen ? [height("60px")] : [height("40px")],
     S.flex,
@@ -26,7 +26,7 @@ let component = ReasonReact.statelessComponent("PostHeader");
 
 let make = (~onClick, ~fullscreen=false, _children) => {
   ...component,
-  render: (_self) =>
+  render: _self =>
     <div className=(className(fullscreen)) onClick>
       (H.se("It's a new day. Click to start your next story."))
     </div>

@@ -16,10 +16,10 @@ let component = ReasonReact.statelessComponent("OpenPostList");
 
 let make = (~posts: State.posts, ~date: option(Date.t), _children) => {
   ...component,
-  render: (_self) =>
+  render: _self =>
     <div className>
       (
-        switch date {
+        switch (date) {
         | Some(d) => H.se(Date.format(Date.YYYYMMDD, d))
         | None => ReasonReact.nullElement
         }
@@ -27,7 +27,11 @@ let make = (~posts: State.posts, ~date: option(Date.t), _children) => {
       <ul>
         (
           ReasonReact.arrayToElement(
-            Array.map((date: Date.t) => <li> (H.se(Date.format(Date.YYYYMMDD, date))) </li>, posts)
+            Array.map(
+              (date: Date.t) =>
+                <li> (H.se(Date.format(Date.YYYYMMDD, date))) </li>,
+              posts
+            )
           )
         )
       </ul>
