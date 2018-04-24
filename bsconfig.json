@@ -2,6 +2,9 @@
   "name": "jour",
   "reason": { "react-jsx": 2 },
   "refmt": 3,
+  "warnings": {
+    "number": "+R"
+  },
   "bs-dependencies": ["reason-react", "bs-director", "bs-glamor", "bs-node"],
   "bsc-flags": ["-bs-no-version-header", "-bs-super-errors"],
   "sources": [

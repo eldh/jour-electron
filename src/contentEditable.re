@@ -2,7 +2,7 @@ open Glamor;
 
 type state = {
   html: string,
-  myRef: ref(option(Dom.element))
+  myRef: ref(option(Dom.element)),
 };
 
 type action =
@@ -10,15 +10,15 @@ type action =
 
 let component = ReasonReact.reducerComponent("ContentEditable");
 
-let setRef = (theRef, {ReasonReact.state}) =>
+let setRef = (theRef, {ReasonReact.state, _}) =>
   state.myRef := Js.Nullable.to_opt(theRef);
 
 let make = (~styles=[], ~onChange, ~html="", _children) => {
   ...component,
   reducer: (action, state) =>
-    switch (action) {
+    switch action {
     | HandleChange =>
-      switch (state.myRef^) {
+      switch state.myRef^ {
       | None => ()
       | Some(theRef) =>
         let obj = ReactDOMRe.domElementToObj(theRef);
@@ -28,8 +28,9 @@ let make = (~styles=[], ~onChange, ~html="", _children) => {
       ReasonReact.Update(state);
     },
   initialState: () => {html, myRef: ref(None)},
-  willReceiveProps: ({state}) => html == state.html ? {...state, html} : state,
-  render: ({state, send, handle}) => {
+  willReceiveProps: ({state, _}) =>
+    html == state.html ? {...state, html} : state,
+  render: ({state, send, handle, _}) => {
     let className = css(styles);
     <div
       ref=(handle(setRef))
